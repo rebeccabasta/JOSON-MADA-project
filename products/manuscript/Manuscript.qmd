@@ -6,6 +6,8 @@ format:
     toc: false
     number-sections: true
     highlight-style: github
+bibliography: ../../assets/dataanalysis-references.bib
+csl: ../../assets/american-journal-of-epidemiology.csl
 
 ---
 
@@ -13,6 +15,7 @@ format:
 # load a few R packages
 library(here)
 library(knitr)
+library(tidyverse)
 ```
 
 
@@ -35,9 +38,7 @@ library(knitr)
 
 
 # Summary/Abstract
-_Write a summary of your project._
-
-_It is recommended to use a structured abstract with Background/Methods/Results/Discussion sections._
+Peanut variety testing programs provide important information for comparing cultivar performance across production environments. In this project, peanut yield data from the Georgia State Variety Testing program were analyzed to evaluate the effects of variety, location, and irrigation on yield and to explore whether machine learning methods could identify meaningful patterns in variety performance. The cleaned dataset included yield observations from 34 peanut varieties across four locations and 12 years. Classical statistical analyses were used to test whether yield differed by variety, location, and irrigation status. In addition, unsupervised machine learning was used to cluster varieties based on average yield, yield variability, and irrigation responsiveness. Supervised machine learning models, including linear regression, LASSO regression, and random forest, were compared using repeated cross-validation to predict peanut yield. Peanut yield differed significantly among varieties, locations, and irrigation treatments. Clustering identified distinct groups of varieties with different yield performance, stability, and irrigation response. In supervised modeling, random forest performed best on the held-out test data, with lower prediction error and higher R² than LASSO regression. Overall, these results show that peanut yield is strongly influenced by both genetic and environmental factors. Machine learning approaches were useful for identifying groups of varieties with similar performance patterns and for predicting yield from variety, year, location, and irrigation status.
 
 {{< pagebreak >}}
 
@@ -45,7 +46,7 @@ _It is recommended to use a structured abstract with Background/Methods/Results/
 # Introduction 
 
 ## General Background Information
-Peanut variety testing programs are conducted to evaluate the performance of different cultivars under regional growing conditions. These trials provide valuable information to growers, breeders, and agricultural researchers by comparing yield potential, disease resistance, and other agronomic traits. Understanding variation among peanut varieties can inform cultivar selection and management decisions that improve productivity and profitability.
+The state of Georgia is the leading producer of peanuts in the United States, accounting for over 50% of total national production [@Georgia_Peanut_Fact_Sheet_2025]. As a result, optimizing peanut variety performance under Georgia growing conditions is critical for maintaining productivity and supporting the economic sustainability of the industry [@brown2021genetic]. Peanut variety testing programs are conducted to evaluate the performance of different cultivars under regional growing conditions [@isleib2014genotype]. These trials provide valuable information to growers, breeders, and agricultural researchers by comparing yield potential, disease resistance, and other agronomic traits. Understanding variation among peanut varieties can inform cultivar selection and management decisions that improve productivity and profitability.
 
 The objective of this analysis was to examine a dataset obtained from a state peanut variety testing facility and identify patterns, trends, or statistically significant differences among peanut varieties. Specifically, this report aims to evaluate how selected variables (such as irrigation, location, yield) vary across cultivars and determine whether meaningful differences exist.
 
@@ -76,31 +77,19 @@ With the scope of this dataset, I will try to answer the following questions:
 
 # Methods 
 
-_Describe your methods. That should describe the data, the cleaning processes, and the analysis approaches. You might want to provide a shorter description here and all the details in the supplement._
-
-
-
-
-
-## Data acquisition
-_As applicable, explain where and how you got the data. If you directly import the data from an online source, you can combine this section with the next._
-
+The analysis included data cleaning, exploratory visualization, classical statistical testing, unsupervised clustering, and supervised machine learning model comparison. The goal was to evaluate whether peanut yield differed across varieties, locations, and irrigation treatments, and to determine whether machine learning methods could identify meaningful patterns in variety performance or improve yield prediction.
 
 ## Data import and cleaning
 Missing information in the form of whitespace and -9 were converted to missing data. Columns that contained numeric information (e.g., total_seed_weight, seed_per_pound, etc.) but classified as characters were converted to numeric data. A subset of the data was created to contain variables necessary for this study: year, location, watered, variety, peanut_yield. Peanut variety names were converted to numbers to keep specific variety performance confidential as requested by the data provider. Lastly, entries with missing data were removed and only varieties grown in all four (4) locations were kept. 
 
-
-
-
-
-
-
-
-
-
-
 ## Statistical analysis
 Peanut yield was analyzed as a continuous response variable to evaluate the effects of variety, location, and irrigation treatment. Differences in yield among peanut varieties and among locations were assessed using analysis of variance (ANOVA). To account for environmental variation, models included year and location effects where appropriate. Differences in yield between irrigated and non-irrigated conditions were evaluated using a two-sample t-test. All statistical analyses were assessed at α = 0.05.
+
+## Machine learning analysis
+
+Two machine learning approaches were used. First, k-means clustering was used as an unsupervised learning method to group peanut varieties based on yield-related traits. Because clustering requires one row per observational unit, the dataset was summarized at the variety level using average yield, yield standard deviation, irrigated yield, non-irrigated yield, and irrigation response. These variables were standardized prior to clustering so that traits measured on larger numerical scales would not dominate the distance calculations. The number of clusters was selected using the elbow method.
+
+Second, supervised machine learning models were used to predict peanut yield from year, location, irrigation status, and variety. Linear regression was used as a baseline model, LASSO regression was used to evaluate regularization and predictor shrinkage, and random forest was used to evaluate whether nonlinear relationships and interactions improved prediction. Models were compared using repeated 5-fold cross-validation. Final model performance was evaluated on a held-out test dataset using RMSE, MAE, and R².
 
 {{< pagebreak >}}
 
@@ -142,10 +131,6 @@ knitr::include_graphics(here("results","figures","eda_p4.png"))
 ```
 
 
-
-@tbl-summarytable shows a summary of the data.
-
-
 ```{r}
 #| label: tbl-summarytable
 #| tbl-cap: "Data summary table."
@@ -153,7 +138,6 @@ knitr::include_graphics(here("results","figures","eda_p4.png"))
 resulttable <- readRDS("../../results/tables/summarytable.rds")
 knitr::kable(resulttable)
 ```
-
 
 
 ## Basic statistical analysis
@@ -190,10 +174,11 @@ knitr::kable(resulttable4)
 
 
 ## Full analysis
+### Clustering
 
 To explore patterns in peanut variety performance, an unsupervised machine learning approach was applied using k-means clustering. Prior to clustering, yield data were summarized at the variety level to capture key performance characteristics, including average yield, yield variability (standard deviation), and responsiveness to irrigation (difference between irrigated and non-irrigated yield). These features were selected to represent productivity, stability, and environmental responsiveness, which are important traits in agricultural systems.
 
-Because these variables were measured on different scales, all features were standardized prior to analysis. The optimal number of clusters was determined using the elbow method, which evaluates within-cluster sum of squares (WSS) across different values of k. A noticeable reduction in WSS was observed up to k = 4, after which improvements diminished, and thus three clusters were selected.
+Because these variables were measured on different scales, all features were standardized prior to analysis. The optimal number of clusters was determined using the elbow method, which evaluates within-cluster sum of squares (WSS) across different values of k. A noticeable reduction in WSS was observed up to k = 4, after which improvements diminished. Therefore, four clusters were selected as a balance between reducing within-cluster variation and maintaining interpretable variety groups.
 
 ```{r}
 #| label: fig-elbow_plot
@@ -206,11 +191,75 @@ Principal component analysis (PCA) was used to visualize the clustering results 
 
 ```{r}
 #| label: fig-pca_plot
-#| fig-cap: "Principal component analysis (PCA) of peanut varieties based on yield-related traits. Varieties are grouped using k-means clustering (k = 3), with each point representing a variety."
+#| fig-cap: "Principal component analysis (PCA) of peanut varieties based on yield-related traits. Varieties are grouped using k-means clustering (k = 4), with each point representing a variety."
 #| echo: FALSE
 knitr::include_graphics(here("results","figures","pca.png"))
 ```
 
+```{r}
+#| label: tbl-cluster-summary
+#| tbl-cap: "Mean yield characteristics of peanut variety clusters."
+#| echo: FALSE
+
+cluster_summary <- readRDS(here("results", "tables", "cluster_summary.rds"))
+
+knitr::kable(cluster_summary, digits = 2)
+```
+
+The cluster summary table shows that the identified groups differed in average yield, yield variability, and irrigation responsiveness. This indicates that the clustering approach captured more than simple yield differences; it also reflected differences in stability and response to irrigation.
+
+### Supervised Machine Learning Model Comparison
+
+In addition to the unsupervised clustering analysis, supervised machine learning models were used to predict peanut yield from year, location, irrigation status, and variety. Because the dataset contained a limited number of predictor variables, the goal of this analysis was not high-dimensional feature discovery, but rather to compare model performance and evaluate which predictors contributed most strongly to yield prediction.
+
+Three models were compared: linear regression, LASSO regression, and random forest. Linear regression was included as a baseline model, LASSO was used to evaluate whether regularization improved prediction by shrinking less informative predictors, and random forest was used to evaluate whether a nonlinear model could better capture interactions among variety, location, irrigation, and year. Models were evaluated using repeated 5-fold cross-validation, with performance assessed using root mean squared error (RMSE), mean absolute error (MAE), and R².
+
+```{r}
+#| label: tbl-model-comparison
+#| tbl-cap: "Best cross-validation performance for each supervised machine learning model used to predict peanut yield."
+#| echo: FALSE
+
+model_comparison <- readRDS(here("results", "tables", "model_comparison_cv.rds"))
+
+best_model_comparison <- model_comparison %>%
+  filter(.metric %in% c("rmse", "mae", "rsq")) %>%
+  group_by(model, .metric) %>%
+  slice_min(
+    order_by = if_else(.metric == "rsq", -mean, mean),
+    n = 1,
+    with_ties = FALSE
+  ) %>%
+  ungroup() %>%
+  select(model, .metric, mean, std_err)
+
+knitr::kable(best_model_comparison, digits = 3)
+
+```
+
+Across cross-validation, random forest consistently achieved lower RMSE and MAE and higher R² compared to both LASSO and linear regression, indicating improved predictive performance.
+
+```{r}
+#| label: tbl-test-model-comparison
+#| tbl-cap: "Final test set performance of selected supervised machine learning models."
+#| echo: FALSE
+
+test_model_comparison <- readRDS(here("results", "tables", "test_model_comparison.rds"))
+
+test_model_comparison %>%
+  select(model, .metric, .estimate) %>%
+  arrange(.metric, .estimate) %>%
+  knitr::kable(digits = 3)
+```
+
+Random forest variable importance was also examined to identify which predictors contributed most strongly to yield prediction. This helped connect model performance back to biological and agronomic interpretation.
+
+```{r}
+#| label: fig-rf-variable-importance
+#| fig-cap: "Random forest variable importance for predicting peanut yield. Larger values indicate predictors that contributed more strongly to model prediction."
+#| echo: FALSE
+
+knitr::include_graphics(here("results", "figures", "rf_variable_importance.png"))
+```
 
 
 
@@ -220,16 +269,25 @@ knitr::include_graphics(here("results","figures","pca.png"))
 # Discussion
 
 ## Summary and Interpretation
-_Summarize what you did, what you found and what it means._
+
+This project evaluated peanut variety performance using both traditional statistical methods and machine learning approaches. The classical statistical analyses showed that yield differed significantly among varieties, locations, and irrigation treatments. These results support the idea that peanut yield is influenced by both genetic differences among varieties and environmental or management-related factors.
+
+The unsupervised clustering analysis provided an additional way to explore variety performance. Rather than evaluating varieties only by average yield, clustering grouped varieties based on yield level, yield variability, and irrigation responsiveness. This helped identify varieties with different agronomic profiles, such as high-yielding but more variable varieties and varieties with more stable performance across conditions.
+
+The supervised machine learning analysis showed that random forest performed better than LASSO regression for predicting peanut yield. This suggests that yield patterns in the dataset may not be fully explained by simple linear effects. Instead, interactions among year, location, irrigation, and variety likely contribute to yield outcomes. The random forest model was better able to capture these complex patterns.
 
 ## Strengths and Limitations
-_Discuss what you perceive as strengths and limitations of your analysis._
+
+A major strength of this analysis is that it used a large, multi-year dataset from a real peanut variety testing program. The dataset included multiple locations, years, irrigation conditions, and varieties, making it useful for evaluating yield patterns across different environments. Another strength is that the project combined several approaches: exploratory visualization, statistical hypothesis testing, unsupervised learning, and supervised model comparison.
+
+However, there are also limitations. The final cleaned dataset included only a small number of predictor variables: year, location, irrigation status, and variety. Because of this, the machine learning models were limited in the types of biological or environmental explanations they could provide. Important factors such as soil type, weather, disease pressure, planting date, and management practices were not included in the final model. In addition, variety identities were anonymized, which protected confidential information but limited the ability to connect results to specific cultivars.
+
+Another limitation is that observations from variety trials may not be fully independent because plots are grouped by year, location, and trial design. While cross-validation helped evaluate model performance, more advanced approaches could account for trial structure more directly.
 
 ## Conclusions
-_What are the main take-home messages?_
+Peanut yield differed significantly among varieties, locations, and irrigation treatments. Clustering identified groups of varieties with distinct yield performance, stability, and irrigation response patterns. In supervised machine learning, random forest provided better yield predictions than LASSO regression, suggesting that nonlinear relationships and interactions are important in explaining peanut yield variation.
 
-_Include citations in your Qmd file using BibTeX, the list of references will automatically be placed at the end_
-
+Overall, this analysis shows that machine learning can complement traditional statistical methods in variety testing datasets. While classical statistics were useful for testing specific effects, clustering and random forest modeling provided additional insight into variety performance patterns and yield prediction.
 
 
 {{< pagebreak >}}
