@@ -1,0 +1,116 @@
+---
+title: Project Review 5
+author: Rebecca Basta
+date: 04/30/2026
+format: 
+  html:
+    toc: true
+    toc-depth: 3
+    number-sections: true
+---
+
+# Overview
+
+**Project:** "Statistical Analysis of Peanut Variety Performance in a State Variety Testing Program"
+
+**Authors:** Emil Joson
+
+**Project reviewer:** Rebecca Basta
+
+# Instructions
+
+# Specific project content evaluation
+
+## Background, Context and Motivation
+
+### Feedback and Comments
+The project provides a comprhensive background, with well-defined research objectives. While the study is placed within existing work and the purpose of the project is clear.
+
+### Summary assessment
+* strong contextualization and motivation
+
+## Question description
+### Feedback and Comments
+The research questions are clearly stated and are easy to understand. The questions align directly with the dataset, the variables include variety, location, irragation, year, and peanut yield. 
+
+### Summary assessment
+* question/hypotheses fully clear
+
+## Data description
+### Feedback and Comments
+The dataset is described well, including its size and source, and the other variables mentioned. However, there is no codebook is included explaining the variables. The data source is identified. 
+
+### Summary assessment
+* source and overall structure of data well explained
+
+## Data wrangling and exploratory analysis
+
+### Feedback and Comments
+The data cleaning and processing steps are appropriate, clearly described, and  aligned with the research questions. Exploratory analyses illustrate key patterns in the data and are reproducible. 
+
+### Summary assessment
+* essentially no weaknesses in wrangling and exploratory component
+
+## Appropriateness of Analysis
+
+### Feedback and Comments
+The analysis methods are appropriate for the data and research questions. The overall workflow included statistical testing, cross-validation, and model evaluation is appropriate. 
+
+The analysis methods used were appropriate. The use of ANOVA and t-tests is appropriate for comparing peanut yield across varieties, locations, and irrigation treatments. The inclusion of both statistical methods and machine learning approaches is a strong point, it allows for both hypothesis testing and predictive modeling.
+
+The use of k-means clustering is appropriate for identifying groups of varieties based on performance characteristics. The use of supervised models (linear regression, LASSO, and random forest) is appropriate for predicting yield. 
+
+### Summary assessment
+* strong and reasonable analysis
+
+## Presentation
+
+### Feedback and Comments
+The results are presented clearly overall, and the structure of the results section is easy to follow. The paper separates descriptive analysis, statistical testing, clustering, and machine learning results, which makes it easier to understand the progression of the analysis. The figures are  easy to interpret and directly relate to the research questions with clear explanations.
+
+### Summary assessment
+* results are very well presented
+
+## Discussion/Conclusions
+
+### Feedback and Comments
+The manuscript is well written and understandable. The study findings are clearly summarized and appropriately explained, with conclusions that are consistent with the results. Strengths and key limitations are acknowledged, regarding the dataset and variable selection.
+
+### Summary assessment
+* strong, complete and clear discussion
+
+## Further comments
+
+# Overall project content evaluation
+
+## Structure
+
+### Feedback and Comments
+The project is well structured, with understandable folder organization separating raw data, processed data, code, and results. However, the structure could be improved with removal of unnecessary files, and better documentation in README files (including a "How to Run" section)
+
+### Summary assessment
+* well structured
+
+## Documentation 
+
+### Feedback and Comments
+The project is well documented, with a clear description of the overall workflow.The analysis and figures are easily understandable. 
+
+### Summary assessment
+* fully and well documented
+
+## Reproducibility
+
+### Feedback and Comments
+The project is reproducible, with a clear structure and code explaining the analysis. However, it including more detailed documentation and explantion in the README files would make it easier to follow. 
+
+### Summary assessment
+* fully reproducible without issues
+
+## Thoroughness
+
+### Feedback and Comments
+The project seemed to be very well thought and planned. the study explores multiple analytical approaches, including descriptive analysis, Logistic regression, and machine learning models with cross-validation, including a little bit of everything we learned in the class.
+
+### Summary assessment
+* strong level of thorougness
